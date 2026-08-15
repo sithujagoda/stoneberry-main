@@ -1,0 +1,16 @@
+fastapi>=0.110.0
+uvicorn>=0.28.0
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9
+pydantic>=2.6.0
+pydantic-settings>=2.2.1
+python-dotenv>=1.0.1
+pyjwt>=2.8.0
+bcrypt>=4.1.0
+email-validator>=2.0.0
+supabase>=2.0.0
+python-multipart>=0.0.9
+tensorflow>=2.16.0
+Pillow>=10.0.0
+pytest>=8.0.0
+pytest-mock>=3.14.0

@@ -1,0 +1,152 @@
+# ==============================================================================
+# Ceylon Gem Marketplace (.gitignore) — Comprehensive Full-Stack Monorepo
+# Covers: Python (FastAPI Backend), Node.js / Next.js 16 (Frontend), Database,
+# Secrets/Environment Variables, Docker, Testing, and System/IDE Files.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. ENVIRONMENT VARIABLES & SECRETS (CRITICAL SECURITY)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.p12
+*.pkcs12
+*.keypair
+backend/.env
+frontend/.env*
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# ------------------------------------------------------------------------------
+# 2. PYTHON / FASTAPI BACKEND DEPENDENCIES & ARTIFACTS
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# ------------------------------------------------------------------------------
+# 3. DATABASE & LOCAL DATA STORAGE
+# ------------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+gem_marketplace.db
+backend/*.db
+backend/*.sqlite
+data/
+sqlite_data/
+
+# ------------------------------------------------------------------------------
+# 4. NODE.JS / NEXT.JS 16 FRONTEND DEPENDENCIES & BUILD
+# ------------------------------------------------------------------------------
+node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Next.js Build Artifacts
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+.vercel/
+
+# ------------------------------------------------------------------------------
+# 5. LOG FILES & DEBUG OUTPUT
+# ------------------------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+backend.log
+frontend.log
+access.log
+error.log
+
+# ------------------------------------------------------------------------------
+# 6. TESTING & COVERAGE ARTIFACTS
+# ------------------------------------------------------------------------------
+coverage/
+.nyc_output/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+
+# ------------------------------------------------------------------------------
+# 7. DOCKER & CONTAINERIZATION
+# ------------------------------------------------------------------------------
+docker-compose.override.yml
+*.log.docker
+
+# ------------------------------------------------------------------------------
+# 8. OS, IDE & EDITOR SYSTEM FILES
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ------------------------------------------------------------------------------
+# 9. MACHINE LEARNING / AI ARTIFACTS
+# ------------------------------------------------------------------------------
+# Ignore dataset contents and zip files but keep the folders
+ai/datasets/raw/*
+!ai/datasets/raw/.gitkeep
+ai/datasets/processed/*
+!ai/datasets/processed/.gitkeep
+
+# Ignore intermediate model checkpoints but keep the folder
+ai/models/*
+!ai/models/.gitkeep

@@ -1,0 +1,32 @@
+# Deep Learning
+tensorflow>=2.16.0
+
+# Data Science
+numpy>=1.26.0
+pandas>=2.2.0
+scikit-learn>=1.4.0
+
+# Image Processing
+opencv-python>=4.10.0
+Pillow>=10.0.0
+
+# Visualization
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Progress Bars
+tqdm>=4.66.0
+
+# Jupyter
+jupyter>=1.0.0
+notebook>=7.0.0
+ipykernel>=6.29.0
+
+# Kaggle API
+kaggle>=1.6.0
+
+# Model Export
+joblib>=1.4.0
+
+# Utility
+python-dotenv>=1.0.1
