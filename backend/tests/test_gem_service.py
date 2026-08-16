@@ -103,3 +103,159 @@ def test_create_gem_listing_failure(mock_gem):
         assert e.detail == "Database error"
 
     db.rollback.assert_called_once()
+
+@patch("backend.app.services.gem_service.joinedload")
+def test_get_filtered_gems_success(mock_joinedload):
+    mock_joinedload.return_value = MagicMock()
+    db = MagicMock()
+    fake_gem = MagicMock()
+    
+    # Mocking query chain
+    query_mock = MagicMock()
+    db.query.return_value.options.return_value = query_mock
+    query_mock.filter.return_value = query_mock
+    query_mock.order_by.return_value.all.return_value = [fake_gem]
+
+    from backend.app.services.gem_service import get_filtered_gems
+    result = get_filtered_gems(db, type_filter="Ruby", min_carat=1.0, search="test")
+
+    assert result == [fake_gem]
+    assert query_mock.filter.called
+    assert query_mock.order_by.called
+
+@patch("backend.app.services.gem_service.joinedload")
+def test_get_seller_gems_success(mock_joinedload):
+    mock_joinedload.return_value = MagicMock()
+    db = MagicMock()
+    fake_gem = MagicMock()
+    
+    query_mock = MagicMock()
+    db.query.return_value.options.return_value = query_mock
+    query_mock.filter.return_value = query_mock
+    query_mock.order_by.return_value.all.return_value = [fake_gem]
+
+    from backend.app.services.gem_service import get_seller_gems
+    result = get_seller_gems(db, 1)
+
+    assert result == [fake_gem]
+    query_mock.filter.assert_called_once()
+
+def test_delete_gem_listing_success():
+    db = MagicMock()
+    fake_gem = MagicMock()
+    fake_gem.seller_id = 1
+    
+    db.query.return_value.filter.return_value.first.return_value = fake_gem
+    # mock delete of dependencies
+    db.query.return_value.filter.return_value.delete.return_value = None
+    db.query.return_value.filter.return_value.all.return_value = []
+
+    from backend.app.services.gem_service import delete_gem_listing
+    result = delete_gem_listing(db, 1, 1)
+
+    assert result is True
+    db.delete.assert_called_with(fake_gem)
+    db.commit.assert_called_once()
+
+def test_delete_gem_listing_not_found():
+    db = MagicMock()
+    db.query.return_value.filter.return_value.first.return_value = None
+
+    from backend.app.services.gem_service import delete_gem_listing
+    
+    try:
+        delete_gem_listing(db, 1, 1)
+        assert False, "Expected HTTPException"
+    except HTTPException as e:
+        assert e.status_code == 404
+
+def test_delete_gem_listing_unauthorized():
+    db = MagicMock()
+    fake_gem = MagicMock()
+    fake_gem.seller_id = 2
+    db.query.return_value.filter.return_value.first.return_value = fake_gem
+
+    from backend.app.services.gem_service import delete_gem_listing
+    
+    try:
+        delete_gem_listing(db, 1, 1)
+        assert False, "Expected HTTPException"
+    except HTTPException as e:
+        assert e.status_code == 403
+
+def test_delete_gem_listing_db_failure():
+    db = MagicMock()
+    fake_gem = MagicMock()
+    fake_gem.seller_id = 1
+    db.query.return_value.filter.return_value.first.return_value = fake_gem
+    
+    db.commit.side_effect = Exception("DB Error")
+
+    from backend.app.services.gem_service import delete_gem_listing
+    
+    try:
+        delete_gem_listing(db, 1, 1)
+        assert False, "Expected HTTPException"
+    except HTTPException as e:
+        assert e.status_code == 500
+        
+    db.rollback.assert_called_once()
+
+def test_update_gem_listing_success():
+    db = MagicMock()
+    fake_gem = MagicMock()
+    fake_gem.seller_id = 1
+    fake_gem.color = "Blue"
+    fake_gem.gemstone_type = "Sapphire"
+    db.query.return_value.filter.return_value.first.return_value = fake_gem
+
+    from backend.app.services.gem_service import update_gem_listing
+    result = update_gem_listing(db, 1, 1, {"color": "Red", "gemstone_type": "Ruby"})
+
+    assert result == fake_gem
+    assert fake_gem.color == "Red"
+    assert fake_gem.gemstone_type == "Ruby"
+    assert fake_gem.name == "Red Ruby"
+    db.commit.assert_called_once()
+    db.refresh.assert_called_once_with(fake_gem)
+
+def test_update_gem_listing_not_found():
+    db = MagicMock()
+    db.query.return_value.filter.return_value.first.return_value = None
+
+    from backend.app.services.gem_service import update_gem_listing
+    try:
+        update_gem_listing(db, 1, 1, {"color": "Red"})
+        assert False
+    except HTTPException as e:
+        assert e.status_code == 404
+
+def test_update_gem_listing_unauthorized():
+    db = MagicMock()
+    fake_gem = MagicMock()
+    fake_gem.seller_id = 2
+    db.query.return_value.filter.return_value.first.return_value = fake_gem
+
+    from backend.app.services.gem_service import update_gem_listing
+    try:
+        update_gem_listing(db, 1, 1, {"color": "Red"})
+        assert False
+    except HTTPException as e:
+        assert e.status_code == 403
+
+def test_update_gem_listing_db_failure():
+    db = MagicMock()
+    fake_gem = MagicMock()
+    fake_gem.seller_id = 1
+    db.query.return_value.filter.return_value.first.return_value = fake_gem
+    
+    db.commit.side_effect = Exception("DB Error")
+
+    from backend.app.services.gem_service import update_gem_listing
+    try:
+        update_gem_listing(db, 1, 1, {"color": "Red"})
+        assert False
+    except HTTPException as e:
+        assert e.status_code == 500
+        
+    db.rollback.assert_called_once()
