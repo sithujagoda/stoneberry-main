@@ -7,6 +7,7 @@ import { useUserStore } from "./UserStoreProvider";
 import { useCompare } from "./CompareProvider";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import TrustEvidenceScore from "./TrustEvidenceScore";
 
 export interface Gem {
   id: number;
@@ -24,6 +25,13 @@ export interface Gem {
   cut_style?: string;
   certificate_url?: string;
   sunlight_image_url?: string;
+  trust_evidence?: {
+    certificate_score: number;
+    provenance_score: number;
+    ai_score: number;
+    seller_score: number;
+    total_score: number;
+  };
 }
 
 interface GemCardProps {
@@ -110,6 +118,13 @@ export default function GemCard({ gem }: GemCardProps) {
         >
           <Heart className={`w-4 h-4 ${isFavourited ? 'fill-current' : ''}`} />
         </button>
+
+        {/* Trust Evidence Badge */}
+        {gem.trust_evidence && (
+          <div className="absolute bottom-3 left-3 z-10">
+            <TrustEvidenceScore trustEvidence={gem.trust_evidence} compact />
+          </div>
+        )}
       </div>
 
       {/* Gem Info Block */}

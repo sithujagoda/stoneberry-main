@@ -13,6 +13,7 @@ import GemCard, { Gem as GemCardType } from "@/components/GemCard";
 import { useUserStore } from "@/components/UserStoreProvider";
 import { useCompare } from "@/components/CompareProvider";
 import GemMediaViewer from "@/components/GemMediaViewer";
+import TrustEvidenceScore from "@/components/TrustEvidenceScore";
 
 export interface Seller {
   id: number;
@@ -68,6 +69,15 @@ export interface Gem {
   created_at?: string;
   seller_id?: number;
   seller?: Seller;
+  ai_confidence?: number;
+  ai_explanation?: string;
+  trust_evidence?: {
+    certificate_score: number;
+    provenance_score: number;
+    ai_score: number;
+    seller_score: number;
+    total_score: number;
+  };
 }
 
 export default function GemDetails({ params }: { params: Promise<{ id: string }> }) {
@@ -618,6 +628,15 @@ export default function GemDetails({ params }: { params: Promise<{ id: string }>
           </div>
         </div>
       </div>
+
+      {/* Trust Evidence Score Section */}
+      {gem.trust_evidence && (
+        <div className="mt-20 border-t border-neutral-200 pt-16">
+          <div className="max-w-xl">
+            <TrustEvidenceScore trustEvidence={gem.trust_evidence} />
+          </div>
+        </div>
+      )}
 
       {/* Gem Journey Section */}
       <div className="mt-20 border-t border-neutral-200 pt-16">
