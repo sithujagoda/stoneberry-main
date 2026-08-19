@@ -38,7 +38,8 @@ const Dropzone = ({
   onFileSelect,
   selectedFile,
   error,
-  verifyImage = false
+  verifyImage = false,
+  onAiFeedback
 }: {
   icon: React.ReactNode,
   title: React.ReactNode,
@@ -47,19 +48,31 @@ const Dropzone = ({
   onFileSelect: (f: File | null) => void,
   selectedFile: File | null,
   error?: string,
-  verifyImage?: boolean
+  verifyImage?: boolean,
+  onAiFeedback?: (feedback: { is_gemstone: boolean; confidence: number; explanation: string; heatmap_base64: string | null } | null) => void
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [aiFeedback, setAiFeedback] = useState<{
+    is_gemstone: boolean;
+    confidence: number;
+    explanation: string;
+    heatmap_base64: string | null;
+  } | null>(null);
+  const [rejectedFile, setRejectedFile] = useState<File | null>(null);
+  const [showHeatmap, setShowHeatmap] = useState(true);
 
-  const isImage = selectedFile && selectedFile.type.startsWith('image/');
-  const previewUrl = selectedFile && isImage ? URL.createObjectURL(selectedFile) : null;
+  const displayFile = selectedFile || rejectedFile;
+  const isImage = displayFile && displayFile.type.startsWith('image/');
+  const previewUrl = displayFile && isImage ? URL.createObjectURL(displayFile) : null;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setLocalError(null);
+      setAiFeedback(null);
+      setRejectedFile(null);
 
       // Instantly clear the old image from the UI
       onFileSelect(null);
@@ -76,8 +89,11 @@ const Dropzone = ({
 
           if (res.ok) {
             const data = await res.json();
+            setAiFeedback(data);
+            onAiFeedback?.(data);
             if (!data.is_gemstone) {
               setLocalError("AI Verification Failed: This does not appear to be a gemstone.");
+              setRejectedFile(file);
               setIsVerifying(false);
               if (fileInputRef.current) fileInputRef.current.value = "";
               return;
@@ -99,7 +115,7 @@ const Dropzone = ({
       <div className="text-[11px] font-bold uppercase tracking-widest text-neutral-500">{label}</div>
       <div
         onClick={() => { if (!isVerifying) fileInputRef.current?.click(); }}
-        className={`border border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all ${isVerifying ? 'opacity-70 cursor-not-allowed border-neutral-300' : 'cursor-pointer'} ${(error || localError) ? 'border-red-400 bg-red-50/30' : selectedFile ? 'border-[#B87A5B] bg-[#B87A5B]/5' : 'border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400'
+        className={`border border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all ${isVerifying ? 'opacity-70 cursor-not-allowed border-neutral-300' : 'cursor-pointer'} ${(error || localError) ? 'border-red-400 bg-red-50/30' : displayFile ? 'border-[#B87A5B] bg-[#B87A5B]/5' : 'border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400'
           }`}
       >
         <input
@@ -113,23 +129,82 @@ const Dropzone = ({
           <div className="flex flex-col items-center py-4">
             <Loader2 className="w-8 h-8 text-[#B87A5B] animate-spin mb-3" />
             <p className="text-[12px] font-bold text-[#B87A5B]">AI is verifying image...</p>
-            <p className="text-[10px] text-neutral-400 mt-1">Please wait a moment</p>
+            <p className="text-[10px] text-neutral-400 mt-1">Generating explanation</p>
           </div>
-        ) : selectedFile ? (
-          <div className="flex flex-col items-center animate-in zoom-in duration-300 w-full">
+        ) : displayFile ? (
+          <div className="flex flex-col items-center animate-in zoom-in duration-300 w-full relative">
             {(error || localError) && <p className="text-red-500 text-[10px] font-bold mb-2">{localError || error}</p>}
+            
             {previewUrl && (
-              <div className="w-full max-w-[200px] aspect-square rounded-lg overflow-hidden mb-3 border border-neutral-200 shadow-sm">
+              <div className="w-full max-w-[200px] aspect-square rounded-lg overflow-hidden mb-2 border border-neutral-200 shadow-sm relative group bg-neutral-100">
                 <img src={previewUrl} alt={label} className="w-full h-full object-cover" />
+                {aiFeedback?.heatmap_base64 && showHeatmap && (
+                   <img src={aiFeedback.heatmap_base64} className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-90 transition-opacity duration-300 group-hover:opacity-20" alt="AI Heatmap" />
+                )}
+                {aiFeedback?.heatmap_base64 && showHeatmap && (
+                  <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/60 text-white text-[8px] px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                    Hover to see original
+                  </div>
+                )}
               </div>
             )}
+
+            {/* Heatmap toggle + legend */}
+            {aiFeedback?.heatmap_base64 && (
+              <div className="flex items-center gap-2 mb-2 w-full max-w-[250px]">
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setShowHeatmap(!showHeatmap); }}
+                  className={`text-[9px] font-bold px-2 py-1 rounded-full border transition-colors ${
+                    showHeatmap
+                      ? 'bg-purple-100 border-purple-300 text-purple-700'
+                      : 'bg-neutral-100 border-neutral-300 text-neutral-500'
+                  }`}
+                >
+                  {showHeatmap ? '🔍 AI View ON' : '🔍 AI View OFF'}
+                </button>
+                {showHeatmap && (
+                  <div className="flex items-center gap-1">
+                    <div className="flex h-2 rounded-full overflow-hidden w-16 border border-neutral-200">
+                      <div className="flex-1" style={{ background: '#0000ff' }} />
+                      <div className="flex-1" style={{ background: '#00ff00' }} />
+                      <div className="flex-1" style={{ background: '#ffff00' }} />
+                      <div className="flex-1" style={{ background: '#ff0000' }} />
+                    </div>
+                    <span className="text-[8px] text-neutral-400">Low → High focus</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {aiFeedback && (
+              <div className={`mb-3 p-3 rounded-lg text-left w-full max-w-[250px] ${aiFeedback.is_gemstone ? 'bg-emerald-50 border border-emerald-100' : 'bg-red-50 border border-red-100'}`}>
+                 <div className="flex justify-between items-center mb-1">
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${aiFeedback.is_gemstone ? 'text-emerald-700' : 'text-red-700'}`}>
+                      {aiFeedback.is_gemstone ? '✅ Gemstone Detected' : '❌ Not a Gemstone'}
+                    </span>
+                    <span className={`text-[11px] font-bold ${aiFeedback.is_gemstone ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {aiFeedback.confidence.toFixed(1)}%
+                    </span>
+                 </div>
+                 <p className="text-[10px] text-neutral-600 leading-tight">
+                    {aiFeedback.explanation}
+                 </p>
+                 {aiFeedback.heatmap_base64 && (
+                   <p className="text-[9px] text-neutral-400 mt-1.5 leading-tight italic">
+                     The heatmap highlights areas the AI focused on. Red/yellow = high attention, blue = low attention.
+                   </p>
+                 )}
+              </div>
+            )}
+            
             <div className="flex items-center gap-2 mb-1">
               <div className="w-5 h-5 rounded-full bg-[#B87A5B]/10 flex items-center justify-center">
                 <Check className="w-3 h-3 text-[#B87A5B]" />
               </div>
-              <p className="text-[12px] font-bold text-[#B87A5B]">{selectedFile.name}</p>
+              <p className="text-[12px] font-bold text-[#B87A5B] truncate max-w-[150px]">{displayFile.name}</p>
             </div>
-            <p className="text-[10px] font-medium text-neutral-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+            <p className="text-[10px] font-medium text-neutral-500">{(displayFile.size / 1024 / 1024).toFixed(2)} MB</p>
             <p className="text-[10px] font-medium text-neutral-400 mt-1">Click to replace</p>
           </div>
         ) : (
@@ -338,6 +413,9 @@ export default function SellGemPage() {
   const [extraMedia, setExtraMedia] = useState<File[]>([]);
   const [certificate, setCertificate] = useState<File | null>(null);
   const [confirmed, setConfirmed] = useState(false);
+  
+  // AI feedback from sunlight image verification
+  const [sunlightAiFeedback, setSunlightAiFeedback] = useState<{ confidence: number; explanation: string } | null>(null);
 
   // Validation State
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -417,6 +495,12 @@ export default function SellGemPage() {
     // Append Seller ID
     if (session?.user?.id) {
       payload.append("sellerId", session.user.id);
+    }
+
+    // Append AI verification results
+    if (sunlightAiFeedback) {
+      payload.append("aiConfidence", String(sunlightAiFeedback.confidence));
+      payload.append("aiExplanation", sunlightAiFeedback.explanation);
     }
 
     try {
@@ -631,6 +715,10 @@ export default function SellGemPage() {
                 onFileSelect={(f) => { setSunlightImage(f); clearFileError('sunlightImage'); }}
                 error={errors.sunlightImage}
                 verifyImage={true}
+                onAiFeedback={(fb) => {
+                  if (fb) setSunlightAiFeedback({ confidence: fb.confidence, explanation: fb.explanation });
+                  else setSunlightAiFeedback(null);
+                }}
               />
               <Dropzone
                 icon={<Camera className="w-7 h-7 text-neutral-400 mb-5" />}
