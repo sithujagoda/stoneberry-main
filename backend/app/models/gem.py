@@ -34,6 +34,10 @@ class Gem(Base):
     extra_media_url = Column(String, nullable=True)
     certificate_url = Column(String, nullable=True)
     
+    # AI verification results (stored at listing time)
+    ai_confidence = Column(Float, nullable=True)
+    ai_explanation = Column(String, nullable=True)
+    
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     is_available = Column(Boolean, default=True, nullable=False)
 

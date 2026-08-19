@@ -22,6 +22,14 @@ class SellerResponse(BaseModel):
     
     model_config = ConfigDict(from_attributes=True)
 
+# Trust Evidence Score breakdown
+class TrustEvidence(BaseModel):
+    certificate_score: float = 0.0
+    provenance_score: float = 0.0
+    ai_score: float = 0.0
+    seller_score: float = 0.0
+    total_score: float = 0.0
+
 # Gem schemas
 class GemBase(BaseModel):
     name: Optional[str] = "Unknown Gem"
@@ -50,6 +58,10 @@ class GemBase(BaseModel):
     studio_image_url: Optional[str] = None
     extra_media_url: Optional[str] = None
     certificate_url: Optional[str] = None
+    
+    ai_confidence: Optional[float] = None
+    ai_explanation: Optional[str] = None
+    
     seller_id: Optional[int] = None
     is_available: Optional[bool] = True
 
@@ -63,5 +75,7 @@ class GemResponse(GemBase):
     id: int
     created_at: datetime
     seller: Optional[SellerResponse] = None
+    trust_evidence: Optional[TrustEvidence] = None
 
     model_config = ConfigDict(from_attributes=True)
+
