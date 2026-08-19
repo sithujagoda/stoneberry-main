@@ -40,11 +40,9 @@ RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /sbin/nologin -c "Do
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Copy source code, scripts, and tests into /app/backend
-
+# Copy source code and scripts into /app/backend
 COPY --chown=appuser:appuser app /app/backend/app
 COPY --chown=appuser:appuser scripts /app/backend/scripts
-COPY --chown=appuser:appuser tests /app/backend/tests
 
 USER appuser
 
