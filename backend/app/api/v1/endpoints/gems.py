@@ -228,7 +228,15 @@ async def create_gem(
     }
 
     db_gem = gem_service.create_gem_listing(db, gem_data)
-    enriched = _enrich_gem_with_trust(db_gem, db)
+    
+    reviews = []
+    if sellerId:
+        reviews = db.query(Review).filter(
+            Review.target_user_id == sellerId,
+            Review.review_type == "BUYER_REVIEWING_SELLER"
+        ).all()
+        
+    enriched = _enrich_gem_with_trust(db_gem, reviews)
     return ApiResponse(success=True, data=enriched)
 
 @router.delete("/{gem_id}", response_model=ApiResponse[bool])

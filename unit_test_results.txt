@@ -1,0 +1,47 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Intel\Desktop\stoneberry-main\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Intel\Desktop\stoneberry-main
+plugins: anyio-4.14.2, mock-3.15.1
+collecting ... collected 38 items
+
+backend/tests/test_auth_service.py::test_register_user_success PASSED    [  2%]
+backend/tests/test_auth_service.py::test_register_user_already_exists PASSED [  5%]
+backend/tests/test_auth_service.py::test_login_user_success PASSED       [  7%]
+backend/tests/test_auth_service.py::test_login_user_not_found PASSED     [ 10%]
+backend/tests/test_auth_service.py::test_login_user_wrong_provider PASSED [ 13%]
+backend/tests/test_auth_service.py::test_login_user_wrong_password PASSED [ 15%]
+backend/tests/test_auth_service.py::test_social_login_user_new PASSED    [ 18%]
+backend/tests/test_auth_service.py::test_social_login_user_existing PASSED [ 21%]
+backend/tests/test_auth_service.py::test_onboarding_user_success PASSED  [ 23%]
+backend/tests/test_auth_service.py::test_get_user_notifications_success PASSED [ 26%]
+backend/tests/test_auth_service.py::test_update_user_profile_success PASSED [ 28%]
+backend/tests/test_auth_service.py::test_update_user_profile_image_success PASSED [ 31%]
+backend/tests/test_gem_service.py::test_get_gem_by_id_success PASSED     [ 34%]
+backend/tests/test_gem_service.py::test_get_gem_by_id_not_found PASSED   [ 36%]
+backend/tests/test_gem_service.py::test_create_gem_listing_success PASSED [ 39%]
+backend/tests/test_gem_service.py::test_create_gem_listing_failure PASSED [ 42%]
+backend/tests/test_gem_service.py::test_get_filtered_gems_success PASSED [ 44%]
+backend/tests/test_gem_service.py::test_get_seller_gems_success PASSED   [ 47%]
+backend/tests/test_gem_service.py::test_delete_gem_listing_success PASSED [ 50%]
+backend/tests/test_gem_service.py::test_delete_gem_listing_not_found PASSED [ 52%]
+backend/tests/test_gem_service.py::test_delete_gem_listing_unauthorized PASSED [ 55%]
+backend/tests/test_gem_service.py::test_delete_gem_listing_db_failure PASSED [ 57%]
+backend/tests/test_gem_service.py::test_update_gem_listing_success PASSED [ 60%]
+backend/tests/test_gem_service.py::test_update_gem_listing_not_found PASSED [ 63%]
+backend/tests/test_gem_service.py::test_update_gem_listing_unauthorized PASSED [ 65%]
+backend/tests/test_gem_service.py::test_update_gem_listing_db_failure PASSED [ 68%]
+backend/tests/test_purchase_service.py::test_create_purchase_inquiry_success PASSED [ 71%]
+backend/tests/test_purchase_service.py::test_create_purchase_inquiry_gem_not_found PASSED [ 73%]
+backend/tests/test_purchase_service.py::test_create_purchase_inquiry_not_available PASSED [ 76%]
+backend/tests/test_purchase_service.py::test_create_purchase_inquiry_self_purchase PASSED [ 78%]
+backend/tests/test_purchase_service.py::test_get_user_buying_requests PASSED [ 81%]
+backend/tests/test_purchase_service.py::test_get_user_selling_requests PASSED [ 84%]
+backend/tests/test_purchase_service.py::test_update_purchase_status_success PASSED [ 86%]
+backend/tests/test_purchase_service.py::test_update_purchase_status_not_found PASSED [ 89%]
+backend/tests/test_purchase_service.py::test_complete_purchase_order_success PASSED [ 92%]
+backend/tests/test_purchase_service.py::test_complete_purchase_order_not_found PASSED [ 94%]
+backend/tests/test_purchase_service.py::test_complete_purchase_order_unauthorized PASSED [ 97%]
+backend/tests/test_purchase_service.py::test_mark_purchase_read_buyer PASSED [100%]
+
+============================= 38 passed in 0.99s ==============================

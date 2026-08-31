@@ -8,6 +8,7 @@ from backend.app.models.favorite import Favorite
 from backend.app.models.purchase_request import PurchaseRequest
 from backend.app.models.message import Message
 from backend.app.models.review import Review
+from backend.app.services.tes_service import calculate_tes
 
 def get_filtered_gems(
     db: Session,
