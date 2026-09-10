@@ -38,7 +38,7 @@ class GemstoneDetector:
 
         model_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "ai_models", "gemstone_detector_final.keras"
+            "ai_models", "gemstone_detector_final_1.keras"
         )
 
         
