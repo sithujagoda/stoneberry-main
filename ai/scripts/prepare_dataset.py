@@ -18,6 +18,8 @@ ROCK_DATASET = BASE_DIR / "datasets/raw/rock-classifier/Rock_Classifier/data"
 
 ROCKS_THREE = BASE_DIR / "datasets/raw/rocks-minerals/rocks_three"
 
+EVERYDAY_OBJECTS = BASE_DIR / "datasets/raw/everyday-objects"
+
 OUTPUT = BASE_DIR / "datasets/processed"
 
 IMAGE_EXTENSIONS = {
@@ -95,12 +97,13 @@ for folder in GEM_DATASET.iterdir():
 print(f"Gemstone Images : {len(gem_images)}")
 
 # ======================================================
-# Collect Rock Images
+# Collect NotGem Images (Rocks + Everyday Objects)
 # ======================================================
 
 print("Collecting non-gem images...")
 
 rock_images = []
+everyday_images = []
 
 # Rock Classifier Dataset
 for folder in ROCK_DATASET.iterdir():
@@ -112,14 +115,28 @@ for folder in ROCKS_THREE.iterdir():
     if folder.is_dir():
         rock_images.extend(get_images(folder))
 
-print(f"Original NotGem Images : {len(rock_images)}")
+# Everyday Objects / Fruits Dataset
+if EVERYDAY_OBJECTS.exists():
+    for folder in EVERYDAY_OBJECTS.iterdir():
+        if folder.is_dir():
+            everyday_images.extend(get_images(folder))
+
+print(f"Original Rock Images : {len(rock_images)}")
+print(f"Original Everyday Images : {len(everyday_images)}")
 
 # ======================================================
-# Balance Dataset
+# Balance Dataset (50% Rocks, 50% Everyday Objects)
 # ======================================================
 
-if len(rock_images) > len(gem_images):
-    rock_images = random.sample(rock_images, len(gem_images))
+target_size = len(gem_images)
+half_size = target_size // 2
+
+# Sample equally from both negative datasets to match gem_images length
+sampled_rocks = random.sample(rock_images, min(len(rock_images), half_size))
+sampled_everyday = random.sample(everyday_images, min(len(everyday_images), target_size - len(sampled_rocks)))
+
+rock_images = sampled_rocks + sampled_everyday
+random.shuffle(rock_images) # Shuffle so train/val/test get a good mix
 
 print(f"Balanced NotGem Images : {len(rock_images)}")
 
