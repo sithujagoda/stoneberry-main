@@ -7,7 +7,7 @@ import "./globals.css";
 import { SessionProvider } from "../components/SessionProvider";
 import { NavbarAuth } from "../components/NavbarAuth";
 import { HeaderIcons } from "../components/HeaderIcons";
-
+import { ClientToaster } from "../components/ClientToaster";
 
 
 const montserrat = Montserrat({
@@ -162,6 +162,7 @@ export default function RootLayout({
           </div>
         </footer>
         </SessionProvider>
+        <ClientToaster />
       </body>
     </html>
   );
