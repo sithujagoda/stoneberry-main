@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { LockClosedIcon, CheckCircleIcon, PhotoIcon } from '@heroicons/react/24/solid';
 import Image from 'next/image';
+import { toast } from "sonner";
 
 interface UserProfile {
   id: number;
@@ -115,11 +116,11 @@ export default function MyDetailsPage() {
         setInitialData(result.data); // Update with new profile image URL
         await update(); // Sync next-auth just in case
       } else {
-        alert(result.error || 'Failed to upload image');
+        toast.error(result.error || 'Failed to upload image');
       }
     } catch (err) {
       console.error(err);
-      alert('Network error occurred during upload.');
+      toast.error('Network error occurred during upload.');
     } finally {
       setIsUploading(false);
     }
@@ -150,11 +151,11 @@ export default function MyDetailsPage() {
         setSaveMessage('Profile updated successfully.');
         setTimeout(() => setSaveMessage(''), 3000);
       } else {
-        alert(result.error || 'Failed to update profile');
+        toast.error(result.error || 'Failed to update profile');
       }
     } catch (err) {
       console.error(err);
-      alert('Network error occurred.');
+      toast.error('Network error occurred.');
     } finally {
       setIsSaving(false);
     }

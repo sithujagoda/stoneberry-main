@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Trash2, ArrowRight } from "lucide-react";
 import { useUserStore } from "@/components/UserStoreProvider";
+import { toast } from "sonner";
 
 export default function CartPage() {
   const { data: session, status } = useSession();
@@ -64,7 +65,7 @@ export default function CartPage() {
         refreshStore();
         router.push("/profile/orders");
       } else {
-        alert(data.error || "Failed to checkout");
+        toast.error(data.error || "Failed to checkout");
       }
     } catch (err) {
       console.error(err);

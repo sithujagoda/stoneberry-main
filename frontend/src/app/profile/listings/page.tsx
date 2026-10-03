@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Edit2, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Gem {
   id: number;
@@ -51,14 +52,14 @@ export default function ListingsPage() {
           method: 'DELETE'
         });
         if (res.ok) {
-          alert('Listing deleted successfully.');
+          toast.success('Listing deleted successfully.');
           setGems(prev => prev.filter(g => g.id !== gemId));
         } else {
-          alert('Failed to delete listing.');
+          toast.error('Failed to delete listing.');
         }
       } catch (err) {
         console.error(err);
-        alert('An error occurred.');
+        toast.error('An error occurred.');
       }
     }
   };

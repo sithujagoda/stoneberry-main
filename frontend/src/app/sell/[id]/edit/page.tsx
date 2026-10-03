@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Upload, Sun, Camera, Check, X, Video, Image as ImageIcon } from "lucide-react";
 import ShapeSelector from "@/components/ShapeSelector";
 import IntensitySelector from "@/components/IntensitySelector";
+import { toast } from "sonner";
 
 // Shared components for styling the form
 const Label = ({ children }: { children: React.ReactNode }) => (
@@ -265,7 +266,7 @@ export default function EditGemPage() {
           const gem = result.data;
           // Check ownership
           if (session?.user?.id && gem.seller_id.toString() !== session.user.id.toString()) {
-            alert("You are not authorized to edit this gem.");
+            toast.error("You are not authorized to edit this gem.");
             router.push('/');
             return;
           }
@@ -310,7 +311,7 @@ export default function EditGemPage() {
           });
           setIsAvailable(gem.is_available ?? true);
         } else {
-          alert("Failed to load gem details.");
+          toast.error("Failed to load gem details.");
         }
       } catch (err) {
         console.error(err);
@@ -328,7 +329,7 @@ export default function EditGemPage() {
   };
 
   const handleSubmit = async () => {
-    if (!confirmed) return alert("Please confirm the terms before posting.");
+    if (!confirmed) return toast.error("Please confirm the terms before posting.");
     setIsSubmitting(true);
 
     const payload = new FormData();
@@ -357,15 +358,15 @@ export default function EditGemPage() {
         body: payload
       });
       if (res.ok) {
-        alert("Gemstone Ad Updated Successfully!");
+        toast.success("Gemstone Ad Updated Successfully!");
         router.push(`/gems/${gemId}`);
       } else {
         const err = await res.json();
-        alert("Error: " + err.detail);
+        toast.error("Error: " + err.detail);
       }
     } catch (error) {
       console.error(error);
-      alert("An error occurred while updating the gemstone.");
+      toast.error("An error occurred while updating the gemstone.");
     } finally {
       setIsSubmitting(false);
     }

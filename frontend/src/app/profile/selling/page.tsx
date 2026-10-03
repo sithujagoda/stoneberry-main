@@ -9,6 +9,7 @@ import NegotiationChat from '@/components/NegotiationChat';
 import ReviewModal from '@/components/ReviewModal';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { ChatBubbleLeftRightIcon, StarIcon } from '@heroicons/react/24/outline';
+import { toast } from 'sonner';
 
 interface PurchaseRequest {
   id: number;
@@ -87,7 +88,7 @@ export default function SellingPage() {
       if (result.success) {
         setRequests(prev => prev.map(req => req.id === requestId ? result.data : req));
       } else {
-        alert(result.error);
+        toast.error(result.error);
       }
     } catch (err) {
       console.error(err);
@@ -115,7 +116,7 @@ export default function SellingPage() {
       throw new Error(data.error || data.detail || 'Failed to submit review');
     }
     
-    alert('Review submitted successfully!');
+    toast.success('Review submitted successfully!');
   };
 
   const getStatusColor = (currentStatus: string) => {

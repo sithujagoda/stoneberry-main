@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import NegotiationChat from '@/components/NegotiationChat';
 import ReviewModal from '@/components/ReviewModal';
 import { ChatBubbleLeftRightIcon, StarIcon } from '@heroicons/react/24/outline';
+import { toast } from 'sonner';
 
 interface PurchaseRequest {
   id: number;
@@ -102,10 +103,10 @@ export default function OrdersPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert("Purchase completed successfully!");
+        toast.success("Purchase completed successfully!");
         fetchOrders(session.user.id as string);
       } else {
-        alert(data.error || "Failed to complete purchase");
+        toast.error(data.error || "Failed to complete purchase");
       }
     } catch (err) {
       console.error(err);
@@ -135,7 +136,7 @@ export default function OrdersPage() {
       throw new Error(data.error || data.detail || 'Failed to submit review');
     }
     
-    alert('Review submitted successfully!');
+    toast.success('Review submitted successfully!');
   };
 
   if (isLoading) {

@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { ArrowLeft, Upload, Sun, Camera, Check, X, Video, Image as ImageIcon, Loader2 } from "lucide-react";
 import ShapeSelector from "@/components/ShapeSelector";
 import IntensitySelector from "@/components/IntensitySelector";
+import { toast } from "sonner";
 
 // Shared components for styling the form
 const Label = ({ children }: { children: React.ReactNode }) => (
@@ -510,20 +511,20 @@ export default function SellGemPage() {
         body: payload
       });
       if (res.ok) {
-        alert("Gemstone Ad Posted Successfully!");
+        toast.success("Gemstone Ad Posted Successfully!");
         window.location.href = "/gems";
       } else {
         try {
           const err = await res.json();
           const message = err.detail || err.error || err.message || "Failed to create listing.";
-          alert("Error: " + message);
+          toast.error("Error: " + message);
         } catch {
-          alert("Error: Failed to create listing. Please check your images and try again.");
+          toast.error("Error: Failed to create listing. Please check your images and try again.");
         }
       }
     } catch (error) {
       console.error(error);
-      alert("An error occurred while posting the gemstone. Please check your connection and try again.");
+      toast.error("An error occurred while posting the gemstone. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);
     }

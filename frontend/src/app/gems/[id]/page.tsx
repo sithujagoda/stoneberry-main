@@ -14,6 +14,7 @@ import { useUserStore } from "@/components/UserStoreProvider";
 import { useCompare } from "@/components/CompareProvider";
 import GemMediaViewer from "@/components/GemMediaViewer";
 import TrustEvidenceScore from "@/components/TrustEvidenceScore";
+import { toast } from "sonner";
 
 export interface Seller {
   id: number;
@@ -275,7 +276,7 @@ export default function GemDetails({ params }: { params: Promise<{ id: string }>
       });
       if (res.ok) {
         refreshStore();
-        alert('Added to cart!');
+        toast.success('Added to cart!');
       }
     } catch (err) {
       console.error(err);
@@ -304,7 +305,7 @@ export default function GemDetails({ params }: { params: Promise<{ id: string }>
       if (res.ok && data.success) {
         router.push('/profile/orders');
       } else {
-        alert(data.error || 'Failed to create request');
+        toast.error(data.error || 'Failed to create request');
       }
     } catch (err) {
       console.error(err);
@@ -334,9 +335,9 @@ export default function GemDetails({ params }: { params: Promise<{ id: string }>
       if (res.ok && data.success) {
         // Refresh store to update notifications if needed
         refreshStore();
-        router.push('/messages');
+        router.push('/messages?thread=' + data.data.id);
       } else {
-        alert(data.error || 'Failed to initialize chat');
+        toast.error(data.error || 'Failed to initialize chat');
       }
     } catch (err) {
       console.error(err);
@@ -578,14 +579,14 @@ export default function GemDetails({ params }: { params: Promise<{ id: string }>
                           method: 'DELETE'
                         });
                         if (res.ok) {
-                          alert('Listing deleted successfully.');
+                          toast.success('Listing deleted successfully.');
                           router.push('/profile/listings');
                         } else {
-                          alert('Failed to delete listing.');
+                          toast.error('Failed to delete listing.');
                         }
                       } catch (err) {
                         console.error(err);
-                        alert('An error occurred.');
+                        toast.error('An error occurred.');
                       }
                     }
                   }}

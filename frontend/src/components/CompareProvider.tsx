@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Gem } from "./GemCard";
+import { toast } from "sonner";
 
 export interface ViewHistoryEntry {
   gem: Gem;
@@ -91,7 +92,7 @@ export function CompareProvider({ children }: { children: ReactNode }) {
         return prev.filter((item) => item.id !== gem.id);
       } else {
         if (prev.length >= MAX_COMPARE_ITEMS) {
-          alert(`You can compare a maximum of ${MAX_COMPARE_ITEMS} gemstones at a time.`);
+          toast.error(`You can compare a maximum of ${MAX_COMPARE_ITEMS} gemstones at a time.`);
           return prev;
         }
         return [...prev, gem];
