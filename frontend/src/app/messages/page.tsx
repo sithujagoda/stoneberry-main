@@ -81,6 +81,20 @@ export default function MessagesPage() {
     scrollToBottom();
   }, [messages.length]);
 
+  useEffect(() => {
+    if (threads.length > 0 && !activeThreadId && typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const threadParam = urlParams.get('thread');
+      if (threadParam) {
+        const tid = parseInt(threadParam);
+        if (!isNaN(tid) && threads.some(t => t.id === tid)) {
+          setActiveThreadId(tid);
+          window.history.replaceState({}, '', '/messages');
+        }
+      }
+    }
+  }, [threads, activeThreadId]);
+
   const fetchThreads = async (uid: number, isPolling: boolean = false) => {
     try {
       const [buyingRes, sellingRes] = await Promise.all([

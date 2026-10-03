@@ -11,7 +11,6 @@ const navigation = [
   { name: 'My Listings', href: '/profile/listings', icon: Square3Stack3DIcon },
   { name: 'Buying Orders', href: '/profile/orders', icon: ShoppingBagIcon },
   { name: 'Selling Offers', href: '/profile/selling', icon: TagIcon },
-  { name: 'Settings', href: '/profile/settings', icon: Cog6ToothIcon },
 ];
 
 function classNames(...classes: string[]) {
