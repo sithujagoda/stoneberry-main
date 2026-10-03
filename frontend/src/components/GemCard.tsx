@@ -42,7 +42,7 @@ export default function GemCard({ gem }: GemCardProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const userId = session?.user?.id ? parseInt(session.user.id as string) : null;
-  const { isInFavorites, refreshStore } = useUserStore();
+  const { isInFavorites, refreshStore, optimisticToggleFavorite } = useUserStore();
   const { isInCompare, toggleCompare } = useCompare();
 
   const isFavourited = isInFavorites(gem.id);
@@ -55,15 +55,23 @@ export default function GemCard({ gem }: GemCardProps) {
       router.push('/login');
       return;
     }
+    
+    // Optimistic UI update
+    optimisticToggleFavorite(gem.id);
+    
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/favorites/toggle`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, gem_id: gem.id })
       });
+      // We don't necessarily need to refresh the whole store just for a favorite toggle if it succeeded,
+      // but we do it to sync just in case. It runs in the background.
       if (res.ok) refreshStore();
     } catch (err) {
       console.error(err);
+      // Revert optimistic update on error
+      optimisticToggleFavorite(gem.id);
     }
   };
 

@@ -13,6 +13,7 @@ interface UserStoreContextType {
   unreadNotificationsCount: number;
   refreshStore: () => Promise<void>;
   isInFavorites: (gemId: number) => boolean;
+  optimisticToggleFavorite: (gemId: number) => void;
 }
 
 const UserStoreContext = createContext<UserStoreContextType | undefined>(undefined);
@@ -85,6 +86,15 @@ export function UserStoreProvider({ children }: { children: ReactNode }) {
     return favorites.some(fav => fav.id === gemId);
   };
 
+  const optimisticToggleFavorite = (gemId: number) => {
+    setFavorites(prev => {
+      if (prev.some(fav => fav.id === gemId)) {
+        return prev.filter(fav => fav.id !== gemId);
+      }
+      return [...prev, { id: gemId }];
+    });
+  };
+
   return (
     <UserStoreContext.Provider value={{
       cartCount,
@@ -95,7 +105,8 @@ export function UserStoreProvider({ children }: { children: ReactNode }) {
       unreadSellingCount,
       unreadNotificationsCount,
       refreshStore,
-      isInFavorites
+      isInFavorites,
+      optimisticToggleFavorite
     }}>
       {children}
     </UserStoreContext.Provider>
