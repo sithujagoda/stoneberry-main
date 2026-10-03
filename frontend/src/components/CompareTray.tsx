@@ -4,12 +4,13 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCompare } from "./CompareProvider";
-import { Scale, X, ArrowRight, Trash2 } from "lucide-react";
+import { Scale, X, ArrowRight, Trash2, ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function CompareTray() {
   const { compareItems, removeFromCompare, clearCompare } = useCompare();
   const [mounted, setMounted] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -21,9 +22,33 @@ export default function CompareTray() {
     return null;
   }
 
+  if (isMinimized) {
+    return (
+      <button
+        onClick={() => setIsMinimized(false)}
+        className="fixed bottom-6 right-6 z-[8888] w-14 h-14 bg-[#B87A5B] hover:bg-[#a66b4d] text-white rounded-full shadow-[0_10px_25px_rgba(184,122,91,0.5)] flex items-center justify-center transition-transform hover:scale-110 animate-in zoom-in duration-300"
+        title="Open Compare Tray"
+      >
+        <Scale className="w-6 h-6" />
+        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-[#B87A5B]">
+          {compareItems.length}
+        </span>
+      </button>
+    );
+  }
+
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[8888] w-full max-w-3xl px-4 animate-in slide-in-from-bottom-8 duration-300">
-      <div className="bg-neutral-950/90 dark:bg-neutral-900/95 text-white backdrop-blur-xl rounded-2xl p-4 sm:px-6 sm:py-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="relative bg-neutral-950/90 dark:bg-neutral-900/95 text-white backdrop-blur-xl rounded-2xl p-4 sm:px-6 sm:py-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4">
+        
+        {/* Minimize Button */}
+        <button
+          onClick={() => setIsMinimized(true)}
+          className="absolute -top-3 -right-3 w-8 h-8 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white rounded-full border border-white/20 shadow-lg flex items-center justify-center transition-colors z-10"
+          title="Minimize tray"
+        >
+          <ChevronDown className="w-4 h-4" />
+        </button>
         
         {/* Left: Title and Thumbnails */}
         <div className="flex items-center gap-4 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
