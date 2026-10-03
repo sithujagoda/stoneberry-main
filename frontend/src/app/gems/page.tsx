@@ -97,6 +97,8 @@ export default function GemsCatalog() {
   const [origin, setOrigin] = useState("All");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
   const categories = ["All", "Blue Sapphire", "Padparadscha", "Ruby", "Yellow Sapphire", "Cat's Eye", "Alexandrite"];
   const origins = ["All", "Ratnapura", "Elahera", "Balangoda"];
@@ -144,14 +146,22 @@ export default function GemsCatalog() {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     fetchGems();
   }, [category, origin, minPrice, maxPrice]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   const filteredGems = gems.filter((gem) =>
     (gem.name || "").toLowerCase().includes(search.toLowerCase()) ||
     (gem.description && gem.description.toLowerCase().includes(search.toLowerCase())) ||
     (gem.cut_style || "").toLowerCase().includes(search.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filteredGems.length / itemsPerPage);
+  const currentGems = filteredGems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12 py-12 font-sans overflow-hidden">
@@ -172,7 +182,7 @@ export default function GemsCatalog() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-6 gap-y-12">
-            {filteredGems.map((gem) => (
+            {currentGems.map((gem) => (
               <GemCard key={gem.id} gem={gem} />
             ))}
           </div>
@@ -180,17 +190,43 @@ export default function GemsCatalog() {
       </div>
 
       {/* Pagination */}
-      {!loading && filteredGems.length > 0 && (
+      {!loading && filteredGems.length > 0 && totalPages > 1 && (
         <div className="mt-16 flex items-center justify-end gap-3 text-sm font-semibold text-[#B0B0B0]">
-          <button className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-300 text-neutral-500 hover:bg-neutral-50 transition-colors">
+          <button 
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-300 text-neutral-500 hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
           </button>
-          <button className="text-black font-bold px-1 hover:text-black transition-colors">1</button>
-          <button className="px-1 hover:text-black transition-colors">2</button>
-          <button className="px-1 hover:text-black transition-colors">3</button>
-          <span className="px-1 tracking-widest text-neutral-300">. . .</span>
-          <button className="px-1 hover:text-black transition-colors">8</button>
-          <button className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-300 text-neutral-500 hover:bg-neutral-50 transition-colors">
+          
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
+            if (
+              page === 1 || 
+              page === totalPages || 
+              (page >= currentPage - 1 && page <= currentPage + 1)
+            ) {
+              return (
+                <button 
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-1 transition-colors ${currentPage === page ? 'text-black font-bold' : 'hover:text-black'}`}
+                >
+                  {page}
+                </button>
+              );
+            }
+            if (page === currentPage - 2 || page === currentPage + 2) {
+              return <span key={page} className="px-1 tracking-widest text-neutral-300">...</span>;
+            }
+            return null;
+          })}
+          
+          <button 
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-300 text-neutral-500 hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
           </button>
         </div>
